@@ -2,12 +2,21 @@ from ward import skip, test
 
 from sliver import SliverClient
 
-from .fixtures import TestConstants, constants, sliver_client
+from .fixtures import TestConstants, constants, extant_jobs, sliver_client
+
+
+@test(
+    "Client can list jobs (also initializes list of extant jobs not to kill)",
+    tags=["client", "listeners", "kill"],
+)
+async def _(client: SliverClient = sliver_client, extant_jobs: list = extant_jobs):  # type: ignore
+    print(extant_jobs)
+    assert await client.jobs()
 
 
 @test(
     "Client can start HTTP listener on specified port",
-    tags=["client", "listeners"],
+    tags=["client", "listeners", "kill"],
 )
 async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
     assert await client.start_http_listener(port=const.http_listen_port)
@@ -90,18 +99,18 @@ async def _(client: SliverClient = sliver_client):  # type: ignore
     assert await client.generate_wg_client_config()
 
 
-@test("Client can kill jobs (except WireGuard)", tags=["client", "listeners"])
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
+@test("Client can kill jobs", tags=["client", "listeners", "kill"])
+async def _(client: SliverClient = sliver_client, extant_jobs: list = extant_jobs):  # type: ignore
     jobs = await client.jobs()
     for job in jobs:
-        # NOTE: remove the check for the WG listener when killing them works
-        if job.Name != const.multiplayer_job_name and job.Name != const.wg_job_name:
+        found = False
+        for extant in extant_jobs:
+            if job.ID == extant.ID:
+                found = True
+                break
+
+        if not found:
             await client.kill_job(job.ID)
 
-    jobs = await client.jobs()
-    for job in jobs:
-        # NOTE: remove the check for the WG listener when killing them works
-        if job.Name != const.multiplayer_job_name and job.Name != const.wg_job_name:
-            assert False
-
-    assert True
+    jobs_remain = await client.jobs()
+    assert len(jobs_remain) == len(extant_jobs)
