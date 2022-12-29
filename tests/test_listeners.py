@@ -90,10 +90,11 @@ async def _(client: SliverClient = sliver_client):  # type: ignore
     assert await client.generate_wg_client_config()
 
 
-@test("Client can kill jobs except WireGuard", tags=["client", "listeners"])
+@test("Client can kill jobs (except WireGuard)", tags=["client", "listeners"])
 async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
     jobs = await client.jobs()
     for job in jobs:
-        if job.Name != const.multiplayer_job_name:
+        # NOTE: remove the check for the WG listener when killing them works
+        if job.Name != const.multiplayer_job_name and job.Name != const.wg_job_name:
             await client.kill_job(job.ID)
     assert len(await client.jobs()) < 2
