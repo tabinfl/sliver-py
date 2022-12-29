@@ -97,4 +97,11 @@ async def _(client: SliverClient = sliver_client, const: TestConstants = constan
         # NOTE: remove the check for the WG listener when killing them works
         if job.Name != const.multiplayer_job_name and job.Name != const.wg_job_name:
             await client.kill_job(job.ID)
-    assert len(await client.jobs()) < 2
+
+    jobs = await client.jobs()
+    for job in jobs:
+        # NOTE: remove the check for the WG listener when killing them works
+        if job.Name != const.multiplayer_job_name and job.Name != const.wg_job_name:
+            assert False
+
+    assert True
