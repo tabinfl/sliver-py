@@ -42,7 +42,7 @@ async def _(client: SliverClient = sliver_client, const: TestConstants = constan
 )
 async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
     assert await client.start_tcp_stager_listener(
-        const.listen_addr, const.stager_listen_port, b"sliver-pytest"
+        const.listen_addr, const.stager_listen_port, const.stager_data
     )
 
 
@@ -52,7 +52,7 @@ async def _(client: SliverClient = sliver_client, const: TestConstants = constan
 )
 async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
     assert await client.start_http_stager_listener(
-        const.listen_addr, const.stager_listen_port + 1, b"sliver-pytest"
+        const.listen_addr, const.stager_listen_port + 1, const.stager_data
     )
 
 
@@ -63,7 +63,7 @@ async def _(client: SliverClient = sliver_client, const: TestConstants = constan
 )
 async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
     assert await client.start_http_stager_listener(
-        const.listen_addr, const.stager_listen_port + 2, b"sliver-pytest"
+        const.listen_addr, const.stager_listen_port + 2, const.stager_data
     )
 
 

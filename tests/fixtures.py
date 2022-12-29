@@ -24,6 +24,7 @@ class TestConstants:
     dns_domain: str
     mtls_listen_port: int
     stager_listen_port: int  # will be incremented by 1 for each stager listener test
+    stager_data: bytes
     wg_listen_ports: list
 
 
@@ -41,6 +42,7 @@ def constants() -> TestConstants:
         dns_domain="sliverpy.local",
         mtls_listen_port=8888,
         stager_listen_port=9000,
+        stager_data=b"sliver-pytest",
         wg_listen_ports=[5553, 8889, 1338],
     )
     return const
