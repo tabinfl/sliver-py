@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import grpc.aio
+import ward.testing
 from ward import test
 
 from sliver import SliverClient
@@ -14,6 +16,11 @@ async def _(
 ):
 
     assert await client.generate_implant(config)
+
+
+@test("Client can list implant builds", tags=["client", "generate", "implant"])
+async def _(client: SliverClient = sliver_client):  # type: ignore
+    assert await client.implant_builds()
 
 
 @test("Client can regenerate an implant", tags=["client", "generate", "implant"])
@@ -53,18 +60,26 @@ async def _(
     assert config.Name not in [build for build in await client.implant_builds()]
 
 
-@test("Client can generate an MSF stager", tags=["client", "generate", "implant"])
+@test(
+    "Client can generate an MSF stager (if msfvenom is available)",
+    tags=["client", "generate", "implant"],
+)
 async def _(client: SliverClient = sliver_client):  # type: ignore
-    stager = await client.generate_msf_stager(
-        arch="amd64",
-        format="raw",
-        host="127.0.0.1",
-        port=9000,
-        os="windows",
-        protocol=StageProtocol.TCP,
-        badchars=[],
-    )
-    assert Path(stager.File.Name)
+    try:
+        stager = await client.generate_msf_stager(
+            arch="amd64",
+            format="raw",
+            host="127.0.0.1",
+            port=9000,
+            os="windows",
+            protocol=StageProtocol.TCP,
+            badchars=[],
+        )
+        assert Path(stager.File.Name)
+
+    except grpc.aio.AioRpcError as rpc_err:
+        # don't fail if server is missing msfvenom
+        assert rpc_err.details().find("executable file not found")
 
 
 @test("Client can generate Donut shellcode", tags=["client", "generate", "implant"])
