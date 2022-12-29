@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from ward import fixture
+from ward import Scope, fixture
 
 from sliver import SliverClient, SliverClientConfig
 from sliver.pb.clientpb.client_pb2 import ImplantC2, ImplantConfig, OutputFormat
@@ -13,6 +13,7 @@ class TestConstants:
     """Dataclass for customizable constants used in testing (e.g. listener
     ports)"""
 
+    op_cfg_file: str
     multiplayer_job_name: str
     wg_job_name: str
     multiplayer_job_port: int
@@ -26,9 +27,10 @@ class TestConstants:
     wg_listen_ports: list
 
 
-@fixture(scope="global")
+@fixture(scope=Scope.Global)
 def constants() -> TestConstants:
     const = TestConstants(
+        op_cfg_file="~/.sliver-client/configs/sliverpy.cfg",
         multiplayer_job_name="grpc",
         wg_job_name="wg",
         multiplayer_job_port=31337,
@@ -44,16 +46,16 @@ def constants() -> TestConstants:
     return const
 
 
-@fixture(scope="global")
-async def sliver_client() -> SliverClient:
-    CONFIG_PATH = Path("~/.sliver-client/configs/sliverpy.cfg").expanduser()
-    config = SliverClientConfig.parse_config_file(CONFIG_PATH)
+@fixture(scope=Scope.Global)
+async def sliver_client(const: TestConstants = constants) -> SliverClient:
+    cfg_path = Path().expanduser(const.op_cfg_file)
+    config = SliverClientConfig.parse_config_file(cfg_path)
     client = SliverClient(config)
     await client.connect()
     return client
 
 
-@fixture(scope="global")
+@fixture(scope=Scope.Global)
 async def implant_config() -> ImplantConfig:
     return ImplantConfig(
         IsBeacon=False,
@@ -66,11 +68,11 @@ async def implant_config() -> ImplantConfig:
     )
 
 
-@fixture(scope="global")
+@fixture(scope=Scope.Test)
 def sliverpy_random_name() -> str:
     return "sliver-pytest-" + os.urandom(8).hex()
 
 
-@fixture(scope="global")
+@fixture(scope=Scope.Global)
 def data_dir() -> Path:
     return Path(__file__).parent / "data"
