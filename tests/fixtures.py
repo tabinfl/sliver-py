@@ -48,7 +48,7 @@ def constants() -> TestConstants:
 
 @fixture(scope=Scope.Global)
 async def sliver_client(const: TestConstants = constants) -> SliverClient:
-    cfg_path = Path().expanduser(const.op_cfg_file)
+    cfg_path = Path(const.op_cfg_file).expanduser()
     config = SliverClientConfig.parse_config_file(cfg_path)
     client = SliverClient(config)
     await client.connect()
