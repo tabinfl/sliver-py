@@ -8,7 +8,18 @@ from sliver.pb.clientpb.client_pb2 import ImplantC2, ImplantConfig, OutputFormat
 
 class TestConstants:
     def __init__(self):
-        self.multiplay_job_name = "grpc"
+        self.multiplayer_job_name = "grpc"
+        self.multiplayer_job_port = 31337
+        self.listen_addr = "0.0.0.0"
+        self.http_listen_port = 8080
+        self.https_listen_port = 8443
+        self.dns_listen_port = 5300
+        self.dns_domain = "sliverpy.local"
+        self.mtls_listen_port = 8888
+        self.stager_listen_port = (
+            9000  # will be incremented by 1 for each stager listener test
+        )
+        self.wg_listen_ports = [5553, 8889, 1338]
 
 
 @fixture(scope="global")
