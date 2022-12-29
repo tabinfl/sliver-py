@@ -1,4 +1,5 @@
 import os
+from dataclasses import dataclass
 from pathlib import Path
 
 from ward import fixture
@@ -7,25 +8,40 @@ from sliver import SliverClient, SliverClientConfig
 from sliver.pb.clientpb.client_pb2 import ImplantC2, ImplantConfig, OutputFormat
 
 
+@dataclass
 class TestConstants:
-    def __init__(self):
-        self.multiplayer_job_name = "grpc"
-        self.multiplayer_job_port = 31337
-        self.listen_addr = "0.0.0.0"
-        self.http_listen_port = 8080
-        self.https_listen_port = 8443
-        self.dns_listen_port = 5300
-        self.dns_domain = "sliverpy.local"
-        self.mtls_listen_port = 8888
-        self.stager_listen_port = (
-            9000  # will be incremented by 1 for each stager listener test
-        )
-        self.wg_listen_ports = [5553, 8889, 1338]
+    """Dataclass for customizable constants used in testing (e.g. listener
+    ports)"""
+
+    multiplayer_job_name: str
+    wg_job_name: str
+    multiplayer_job_port: int
+    listen_addr: str
+    http_listen_port: int
+    https_listen_port: int
+    dns_listen_port: int
+    dns_domain: str
+    mtls_listen_port: int
+    stager_listen_port: int  # will be incremented by 1 for each stager listener test
+    wg_listen_ports: list
 
 
 @fixture(scope="global")
 def constants() -> TestConstants:
-    return TestConstants()
+    const = TestConstants(
+        multiplayer_job_name="grpc",
+        wg_job_name="wg",
+        multiplayer_job_port=31337,
+        listen_addr="0.0.0.0",
+        http_listen_port=8080,
+        https_listen_port=8443,
+        dns_listen_port=5300,
+        dns_domain="sliverpy.local",
+        mtls_listen_port=8888,
+        stager_listen_port=9000,
+        wg_listen_ports=[5553, 8889, 1338],
+    )
+    return const
 
 
 @fixture(scope="global")
