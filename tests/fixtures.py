@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ward import Scope, fixture
 
-from sliver import SliverClient, SliverClientConfig
+from sliver import InteractiveSession, SliverClient, SliverClientConfig
 from sliver.pb.clientpb.client_pb2 import ImplantC2, ImplantConfig, OutputFormat
 
 
@@ -27,9 +27,18 @@ class TestConstants:
     stager_data: bytes
     wg_listen_ports: list
 
+    # below are for interactive tests
+    mkdir_path: Path
+    file_path: Path
+    file_data: bytes
+    env_var: str
+    env_value: str
+
 
 @fixture(scope=Scope.Global)
-def constants() -> TestConstants:
+def test_constants() -> TestConstants:
+    rand_string = "sliver-pytest-" + os.urandom(8).hex()
+
     const = TestConstants(
         op_cfg_file="~/.sliver-client/configs/sliverpy.cfg",
         multiplayer_job_name="grpc",
@@ -44,17 +53,31 @@ def constants() -> TestConstants:
         stager_listen_port=9000,
         stager_data=b"sliver-pytest",
         wg_listen_ports=[5553, 8889, 1338],
+        # below are for interactive tests
+        mkdir_path=Path(f"/tmp/{rand_string}"),
+        file_path=Path(f"/tmp/{rand_string}.txt"),
+        file_data=bytes(rand_string),
+        env_var=f"SLIVERPY_TEST_{rand_string}",
+        env_value=rand_string,
     )
     return const
 
 
 @fixture(scope=Scope.Global)
-async def sliver_client(const: TestConstants = constants) -> SliverClient:
+async def sliver_client(const: TestConstants = test_constants) -> SliverClient:
     cfg_path = Path(const.op_cfg_file).expanduser()
     config = SliverClientConfig.parse_config_file(cfg_path)
     client = SliverClient(config)
     await client.connect()
     return client
+
+
+@fixture(scope=Scope.Global)
+async def extant_jobs(client: SliverClient = sliver_client) -> list:  # type: ignore
+    # Keep a list of jobs already running, so we don't kill them
+    jobs = await client.jobs()
+    print(jobs)
+    return jobs
 
 
 @fixture(scope=Scope.Global)
@@ -68,6 +91,16 @@ async def implant_config() -> ImplantConfig:
         ObfuscateSymbols=False,
         C2=[ImplantC2(Priority=0, URL="http://localhost:80")],
     )
+
+
+@fixture(scope=Scope.Module)
+async def session_zero(client: SliverClient = sliver_client) -> InteractiveSession:  # type: ignore
+    sessions = await client.sessions()
+    for sess in sessions:
+        if not sess.IsDead:
+            break
+
+    return await client.interact_session(sess.ID)  # type: ignore
 
 
 @fixture(scope=Scope.Test)

@@ -2,7 +2,7 @@ from ward import skip, test
 
 from sliver import SliverClient
 
-from .fixtures import TestConstants, constants, extant_jobs, sliver_client
+from .fixtures import TestConstants, extant_jobs, sliver_client, test_constants
 
 
 @test(
@@ -18,22 +18,22 @@ async def _(client: SliverClient = sliver_client, extant_jobs: list = extant_job
     "Client can start HTTP listener on specified port",
     tags=["client", "listeners", "kill"],
 )
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
-    assert await client.start_http_listener(port=const.http_listen_port)
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
+    assert await client.start_http_listener(port=test_const.http_listen_port)
 
 
 @test(
     "Client can start HTTPS listener on specified port",
     tags=["client", "listeners"],
 )
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
-    assert await client.start_https_listener(port=const.https_listen_port)
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
+    assert await client.start_https_listener(port=test_const.https_listen_port)
 
 
 @test("Client can start DNS listener on specified port", tags=["client", "listeners"])
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
     assert await client.start_dns_listener(
-        port=const.dns_listen_port, domains=[const.dns_domain]
+        port=test_const.dns_listen_port, domains=[test_const.dns_domain]
     )
 
 
@@ -41,17 +41,17 @@ async def _(client: SliverClient = sliver_client, const: TestConstants = constan
     "Client can start MTLS listener on specified port",
     tags=["client", "listeners"],
 )
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
-    assert await client.start_mtls_listener(port=const.mtls_listen_port)
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
+    assert await client.start_mtls_listener(port=test_const.mtls_listen_port)
 
 
 @test(
     "Client can start TCP stager listener on specified port",
     tags=["client", "listeners"],
 )
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
     assert await client.start_tcp_stager_listener(
-        const.listen_addr, const.stager_listen_port, const.stager_data
+        test_const.listen_addr, test_const.stager_listen_port, test_const.stager_data
     )
 
 
@@ -59,9 +59,11 @@ async def _(client: SliverClient = sliver_client, const: TestConstants = constan
     "Client can start HTTP stager listener on specified ports",
     tags=["client", "listeners"],
 )
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
     assert await client.start_http_stager_listener(
-        const.listen_addr, const.stager_listen_port + 1, const.stager_data
+        test_const.listen_addr,
+        test_const.stager_listen_port + 1,
+        test_const.stager_data,
     )
 
 
@@ -70,9 +72,11 @@ async def _(client: SliverClient = sliver_client, const: TestConstants = constan
     "Client can start HTTPS stager listener on specified ports",
     tags=["client", "listeners"],
 )
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
     assert await client.start_http_stager_listener(
-        const.listen_addr, const.stager_listen_port + 2, const.stager_data
+        test_const.listen_addr,
+        test_const.stager_listen_port + 2,
+        test_const.stager_data,
     )
 
 
@@ -83,14 +87,14 @@ async def _(client: SliverClient = sliver_client):  # type: ignore
 
 @skip("Something is wrong with killing WG listeners on the server")
 @test("Client can start WG listener on specified ports", tags=["client", "listeners"])
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
     ip = await client.generate_wg_ip()
     print(ip.IP)
     assert await client.start_wg_listener(
         ip.IP,
-        const.wg_listen_ports[0],
-        const.wg_listen_ports[1],
-        const.wg_listen_ports[2],
+        test_const.wg_listen_ports[0],
+        test_const.wg_listen_ports[1],
+        test_const.wg_listen_ports[2],
     )
 
 

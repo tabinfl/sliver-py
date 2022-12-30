@@ -2,7 +2,7 @@ from ward import test
 
 from sliver import SliverClient
 
-from .fixtures import TestConstants, constants, sliver_client
+from .fixtures import TestConstants, sliver_client, test_constants
 
 
 @test("Client can get version", tags=["client", "server_info", "connect"])
@@ -27,5 +27,5 @@ async def _(client: SliverClient = sliver_client):  # type: ignore
 
 
 @test("Client can get job by port", tags=["client", "server_info"])
-async def _(client: SliverClient = sliver_client, const: TestConstants = constants):  # type: ignore
-    assert await client.job_by_port(const.multiplayer_job_port)
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
+    assert await client.job_by_port(test_const.multiplayer_job_port)
