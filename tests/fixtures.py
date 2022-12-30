@@ -28,8 +28,8 @@ class TestConstants:
     wg_listen_ports: list
 
     # below are for interactive tests
-    mkdir_path: Path
-    file_path: Path
+    mkdir_path: str
+    file_path: str
     file_data: bytes
     env_var: str
     env_value: str
@@ -39,7 +39,7 @@ class TestConstants:
 def test_constants() -> TestConstants:
     rand_string = "sliver-pytest-" + os.urandom(8).hex()
 
-    const = TestConstants(
+    test_const = TestConstants(
         op_cfg_file="~/.sliver-client/configs/sliverpy.cfg",
         multiplayer_job_name="grpc",
         wg_job_name="wg",
@@ -54,13 +54,13 @@ def test_constants() -> TestConstants:
         stager_data=b"sliver-pytest",
         wg_listen_ports=[5553, 8889, 1338],
         # below are for interactive tests
-        mkdir_path=Path(f"/tmp/{rand_string}"),
-        file_path=Path(f"/tmp/{rand_string}.txt"),
-        file_data=bytes(rand_string),
+        mkdir_path=f"/tmp/{rand_string}",
+        file_path=f"/tmp/{rand_string}.txt",
+        file_data=bytes(rand_string, "utf8"),
         env_var=f"SLIVERPY_TEST_{rand_string}",
         env_value=rand_string,
     )
-    return const
+    return test_const
 
 
 @fixture(scope=Scope.Global)
