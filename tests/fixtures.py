@@ -14,6 +14,7 @@ class TestConstants:
     ports)"""
 
     op_cfg_file: str
+    implant_profile_name: str
     multiplayer_job_name: str
     wg_job_name: str
     multiplayer_job_port: int
@@ -41,15 +42,16 @@ def test_constants() -> TestConstants:
 
     test_const = TestConstants(
         op_cfg_file="~/.sliver-client/configs/sliverpy.cfg",
+        implant_profile_name=f"{rand_string}",
         multiplayer_job_name="grpc",
         wg_job_name="wg",
         multiplayer_job_port=31337,
         listen_addr="0.0.0.0",
-        http_listen_port=8080,
+        http_listen_port=8787,
         https_listen_port=8443,
         dns_listen_port=5300,
         dns_domain="sliverpy.local",
-        mtls_listen_port=8888,
+        mtls_listen_port=8899,
         stager_listen_port=9000,
         stager_data=b"sliver-pytest",
         wg_listen_ports=[5553, 8889, 1338],

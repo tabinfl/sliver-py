@@ -2,7 +2,7 @@ from ward import test
 
 from sliver.session import InteractiveSession
 
-from .fixtures import TestConstants, session_zero, sliverpy_random_name, test_constants
+from .fixtures import TestConstants, session_zero, test_constants
 
 
 @test(

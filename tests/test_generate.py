@@ -1,13 +1,18 @@
 from pathlib import Path
 
 import grpc.aio
-import ward.testing
 from ward import test
 
 from sliver import SliverClient
 from sliver.pb.clientpb.client_pb2 import ImplantConfig, ImplantProfile, StageProtocol
 
-from .fixtures import data_dir, implant_config, sliver_client, sliverpy_random_name
+from .fixtures import (
+    TestConstants,
+    data_dir,
+    implant_config,
+    sliver_client,
+    test_constants,
+)
 
 
 @test("Client can generate a new implant", tags=["client", "generate", "implant"])
@@ -34,19 +39,23 @@ async def _(
 async def _(
     client: SliverClient = sliver_client,  # type: ignore
     config: ImplantConfig = implant_config,  # type: ignore
-    name: str = sliverpy_random_name,  # type: ignore
+    test_const: TestConstants = test_constants,  # type: ignore
 ):
-    implant_profile = ImplantProfile(Name=name, Config=config)
+    implant_profile = ImplantProfile(
+        Name=test_const.implant_profile_name, Config=config
+    )
     assert await client.save_implant_profile(implant_profile)
 
 
 @test("Client can list implant profiles", tags=["client", "generate", "implant"])
-async def _(client: SliverClient = sliver_client, name: str = sliverpy_random_name):  # type: ignore
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
+    name = test_const.implant_profile_name
     assert name in [profile.Name for profile in await client.implant_profiles()]
 
 
 @test("Client can delete implant profiles", tags=["client", "generate", "implant"])
-async def _(client: SliverClient = sliver_client, name: str = sliverpy_random_name):  # type: ignore
+async def _(client: SliverClient = sliver_client, test_const: TestConstants = test_constants):  # type: ignore
+    name = test_const.implant_profile_name
     await client.delete_implant_profile(name)
     assert name not in [profile.Name for profile in await client.implant_profiles()]
 
